@@ -43,7 +43,7 @@ int main() {
         // DIVIDE
         else if (c.find("divide(") == 0) {
             int a, b;
-            sscanf(c.c_str(), "divise(%d/%d)", &a, &b);
+            sscanf(c.c_str(), "divide(%d/%d)", &a, &b);
             cout << a / b;
 
         }
