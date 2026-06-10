@@ -11,7 +11,7 @@ int main() {
     vector<string> program;
     map<string, string> vars;
 
-    cout << "==SpaceLang==\n";
+    cout << "==Action==\n";
 
     while (true) {
         getline(cin, c);
@@ -90,7 +90,7 @@ int main() {
                 }
             }
 
-            cout << "Program finished.\n";
+            cout << "\nProgram finished.\n";
         } else {
             program.push_back(c);
         }
