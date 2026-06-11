@@ -88,4 +88,3 @@ Hi
 * Integer math only
 * No spaces in expressions
 * Variables stored as strings
-* Runs line by line
