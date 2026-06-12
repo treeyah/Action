@@ -69,6 +69,7 @@ get(user)
 add(10+5)
 repeat(2)
 write(Hi)
+run()
 
 
 ### Output
