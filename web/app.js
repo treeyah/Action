@@ -120,15 +120,29 @@ document.getElementById("run-btn").addEventListener("click", runProgram);
 // ---------- Run via the WASM interpreter ----------
 // Action.cpp is an interactive stdin loop. We feed the editor's lines, then
 // run() to execute, then exit() to terminate the loop, and capture stdout.
+//
+// input() reads a line from stdin *during* run(). Because we feed everything
+// up front, we collect a value for each input() command (via prompt) and place
+// those values right after run() so they're consumed in order, with exit()
+// last so the interpreter still terminates.
 async function runProgram() {
-  outputEl.textContent = "Running...\n";
-
   const lines = codeEl.value
     .split("\n")
-    .filter((l) => l.trim() !== "" && l.trim() !== "run()" && l.trim() !== "exit()");
+    .map((l) => l.trim())
+    .filter((l) => l !== "" && l !== "run()" && l !== "exit()");
 
-  const input = lines.join("\n") + "\nrun()\nexit()\n";
-  const bytes = new TextEncoder().encode(input);
+  // One prompted value per input() command, in order.
+  const inputCount = lines.filter((l) => l === "input()").length;
+  const answers = [];
+  for (let i = 0; i < inputCount; i++) {
+    const ans = prompt(`Input ${i + 1} of ${inputCount}:`);
+    answers.push(ans === null ? "" : ans);
+  }
+
+  outputEl.textContent = "Running...\n";
+
+  const feed = lines.concat("run()", answers, "exit()").join("\n") + "\n";
+  const bytes = new TextEncoder().encode(feed);
   let pos = 0;
 
   const out = [];
