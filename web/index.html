@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Action</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- ============ MENU VIEW ============ -->
+  <section id="menu" class="view">
+    <img id="logo" src="logo.png" alt="Action" onerror="this.style.display='none';document.getElementById('logo-fallback').style.display='block'">
+    <h1 id="logo-fallback" style="display:none">ACTION</h1>
+
+    <div class="menu-actions">
+      <button id="new-btn" class="big-btn">Start a new code</button>
+      <button id="show-all-btn" class="big-btn">Commands</button>
+    </div>
+
+    <div id="continue-section">
+      <h2>Continue a code</h2>
+      <ul id="program-list"></ul>
+      <p id="no-programs" class="muted">No saved programs yet.</p>
+    </div>
+  </section>
+
+  <!-- ============ COMMANDS REFERENCE VIEW ============ -->
+  <section id="gallery-view" class="view" hidden>
+    <header class="editor-header">
+      <button id="gallery-back-btn">&larr; Menu</button>
+      <span class="program-name">Commands</span>
+    </header>
+
+    <div id="ref-list">
+      <div class="ref-card">
+        <code class="ref-syntax">write(text)</code>
+        <p class="ref-desc">Print text to the output.</p>
+        <code class="ref-example">write(Hello)  &rarr;  Hello</code>
+      </div>
+      <div class="ref-card">
+        <code class="ref-syntax">add(a+b)</code>
+        <p class="ref-desc">Print the sum of two whole numbers.</p>
+        <code class="ref-example">add(10+5)  &rarr;  15</code>
+      </div>
+      <div class="ref-card">
+        <code class="ref-syntax">minus(a-b)</code>
+        <p class="ref-desc">Print the difference.</p>
+        <code class="ref-example">minus(10-4)  &rarr;  6</code>
+      </div>
+      <div class="ref-card">
+        <code class="ref-syntax">times(a*b)</code>
+        <p class="ref-desc">Print the product.</p>
+        <code class="ref-example">times(6*7)  &rarr;  42</code>
+      </div>
+      <div class="ref-card">
+        <code class="ref-syntax">divide(a/b)</code>
+        <p class="ref-desc">Print the quotient (whole-number division). Dividing by zero shows an error.</p>
+        <code class="ref-example">divide(20/4)  &rarr;  5</code>
+      </div>
+      <div class="ref-card">
+        <code class="ref-syntax">set(name=value)</code>
+        <p class="ref-desc">Store a variable for later use.</p>
+        <code class="ref-example">set(user=Ben)</code>
+      </div>
+      <div class="ref-card">
+        <code class="ref-syntax">get(name)</code>
+        <p class="ref-desc">Print the value of a stored variable.</p>
+        <code class="ref-example">get(user)  &rarr;  Ben</code>
+      </div>
+      <div class="ref-card">
+        <code class="ref-syntax">repeat(n)</code>
+        <p class="ref-desc">Run the next command n times.</p>
+        <code class="ref-example">repeat(2)<br>write(Hi)  &rarr;  Hi (twice)</code>
+      </div>
+    </div>
+
+    <p class="ref-note">
+      Rules: no spaces inside the brackets, and math uses whole numbers only.
+      You don't need to type <code>run()</code> &mdash; the Run button does that for you.
+    </p>
+  </section>
+
+  <!-- ============ EDITOR VIEW ============ -->
+  <section id="editor-view" class="view" hidden>
+    <header class="editor-header">
+      <button id="back-btn">&larr; Menu</button>
+      <span id="program-name" class="program-name"></span>
+      <div class="editor-buttons">
+        <button id="run-btn" class="primary">Run &#9654;</button>
+        <button id="save-btn">Save</button>
+        <button id="clear-output-btn">Clear output</button>
+      </div>
+    </header>
+
+    <div class="panes">
+      <div class="pane">
+        <label class="pane-label">Code</label>
+        <textarea id="code" spellcheck="false" placeholder="write(Hello)
+set(user=Ben)
+get(user)
+add(10+5)
+repeat(2)
+write(Hi)"></textarea>
+      </div>
+      <div class="pane">
+        <label class="pane-label">Output</label>
+        <pre id="output"></pre>
+      </div>
+    </div>
+  </section>
+
+  <script src="action.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
