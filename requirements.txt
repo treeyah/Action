@@ -1,0 +1,3 @@
+# No third-party dependencies — the web process uses Python's built-in
+# http.server to serve the static site in web/. This file's presence tells
+# Dokku to use the Python buildpack (which provides python3).
