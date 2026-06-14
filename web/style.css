@@ -1,10 +1,10 @@
 :root {
-  --bg: #000;
-  --fg: #e0e0e0;
-  --muted: #777;
-  --accent: #39ff14;
-  --panel: #111;
-  --border: #2a2a2a;
+  --bg: #2a1d13;       /* warm dark brown */
+  --fg: #f3e7d9;       /* soft cream */
+  --muted: #b59d86;    /* muted tan */
+  --accent: #d9a064;   /* cosy light brown / caramel */
+  --panel: #392a1d;    /* lighter brown panel */
+  --border: #4e3a2a;   /* brown border */
 }
 
 * { box-sizing: border-box; }
@@ -32,7 +32,14 @@ body {
   padding: 4rem 2rem;
 }
 
-#logo { max-width: 560px; width: 80%; height: auto; }
+#logo {
+  max-width: 560px;
+  width: 80%;
+  height: auto;
+  /* The logo image has a black background; screen blending drops it into the
+     warm page background while keeping the bright splat. */
+  mix-blend-mode: screen;
+}
 #logo-fallback {
   font-size: 6rem;
   letter-spacing: 0.6rem;
@@ -129,7 +136,7 @@ body {
 .ref-example {
   display: block;
   color: var(--muted);
-  background: #000;
+  background: #1f140c;
   border: 1px solid var(--border);
   border-radius: 4px;
   padding: 0.5rem 0.7rem;
@@ -161,7 +168,7 @@ button.primary, button.big-btn {
 }
 button.primary:hover, button.big-btn:hover {
   background: var(--accent);
-  color: #000;
+  color: var(--bg);
 }
 
 /* ---------- Editor ---------- */
