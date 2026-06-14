@@ -18,14 +18,16 @@
 
 body {
   margin: 0;
-  background: var(--bg);
+  /* Dark in the middle, warm glow toward the edges */
+  background: radial-gradient(ellipse 140% 115% at 50% 50%,
+              #0a0703 0%, #0f0a05 32%, #3a2710 72%, #6e4a20 100%) fixed;
   color: var(--fg);
   font-family: var(--font-body);
   font-size: 1.05rem;
   min-height: 100vh;
 }
 
-/* Film-grain texture + vignette for a cosy, lamp-lit feel */
+/* Film-grain texture for a cosy, lamp-lit feel */
 body::before {
   content: '';
   position: fixed;
@@ -34,14 +36,6 @@ body::before {
   opacity: 0.04;
   pointer-events: none;
   z-index: 9998;
-}
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(ellipse 100% 100% at 50% 50%, transparent 60%, rgba(0,0,0,0.30) 100%);
-  pointer-events: none;
-  z-index: 9997;
 }
 
 .view { padding: 2rem; }
