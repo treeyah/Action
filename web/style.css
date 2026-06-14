@@ -1,12 +1,12 @@
 :root {
-  --bg: #1b130b;        /* warm dark brown */
-  --surface: #261b11;   /* panel */
-  --surface-2: #322417; /* lighter brown */
-  --border: #45301c;    /* brown border */
-  --fg: #ecdcc2;        /* soft cream */
-  --muted: #a88c6c;     /* muted tan */
-  --accent: #cf9542;    /* cosy caramel */
-  --accent-fg: #1b130b; /* text on accent */
+  --bg: #332417;        /* warm cosy brown */
+  --surface: #40301f;   /* panel */
+  --surface-2: #4d3a26; /* lighter brown */
+  --border: #5e472e;    /* brown border */
+  --fg: #f2e5d0;        /* soft cream */
+  --muted: #bda07b;     /* muted tan */
+  --accent: #e0a85c;    /* cosy caramel */
+  --accent-fg: #2a1d10; /* text on accent */
   --panel: var(--surface);
   --radius: 0.4rem;
   --font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
@@ -39,7 +39,7 @@ body::after {
   content: '';
   position: fixed;
   inset: 0;
-  background: radial-gradient(ellipse 100% 100% at 50% 50%, transparent 45%, rgba(0,0,0,0.55) 100%);
+  background: radial-gradient(ellipse 100% 100% at 50% 50%, transparent 60%, rgba(0,0,0,0.30) 100%);
   pointer-events: none;
   z-index: 9997;
 }
@@ -67,8 +67,8 @@ body::after {
 }
 
 #logo {
-  max-width: 440px;
-  width: 78%;
+  max-width: 560px;
+  width: 85%;
   height: auto;
   /* The logo image has a black background; screen blending drops it into the
      warm page background while keeping the bright splat. */
@@ -94,18 +94,18 @@ body::after {
 .menu-actions {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: 1.1rem;
   width: 100%;
-  max-width: 26rem;
+  max-width: 30rem;
 }
 
 .big-btn {
   width: 100%;
   font-family: var(--font-display);
-  font-size: 1.35rem;
+  font-size: 1.7rem;
   font-weight: 600;
   letter-spacing: 0.02em;
-  padding: 0.95rem 1.5rem;
+  padding: 1.2rem 2rem;
   color: var(--accent-fg);
   background: var(--accent);
   border: none;
