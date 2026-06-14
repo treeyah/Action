@@ -1,10 +1,17 @@
 :root {
-  --bg: #2a1d13;       /* warm dark brown */
-  --fg: #f3e7d9;       /* soft cream */
-  --muted: #b59d86;    /* muted tan */
-  --accent: #d9a064;   /* cosy light brown / caramel */
-  --panel: #392a1d;    /* lighter brown panel */
-  --border: #4e3a2a;   /* brown border */
+  --bg: #1b130b;        /* warm dark brown */
+  --surface: #261b11;   /* panel */
+  --surface-2: #322417; /* lighter brown */
+  --border: #45301c;    /* brown border */
+  --fg: #ecdcc2;        /* soft cream */
+  --muted: #a88c6c;     /* muted tan */
+  --accent: #cf9542;    /* cosy caramel */
+  --accent-fg: #1b130b; /* text on accent */
+  --panel: var(--surface);
+  --radius: 0.4rem;
+  --font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-body: 'Crimson Pro', Georgia, 'Times New Roman', serif;
+  --font-mono: "SF Mono", "Menlo", "Consolas", monospace;
 }
 
 * { box-sizing: border-box; }
@@ -13,8 +20,28 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--fg);
-  font-family: "SF Mono", "Menlo", "Consolas", monospace;
+  font-family: var(--font-body);
+  font-size: 1.05rem;
   min-height: 100vh;
+}
+
+/* Film-grain texture + vignette for a cosy, lamp-lit feel */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.04;
+  pointer-events: none;
+  z-index: 9998;
+}
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse 100% 100% at 50% 50%, transparent 45%, rgba(0,0,0,0.55) 100%);
+  pointer-events: none;
+  z-index: 9997;
 }
 
 .view { padding: 2rem; }
@@ -28,47 +55,81 @@ body {
   justify-content: center;
   min-height: 100vh;
   text-align: center;
-  gap: 3rem;
-  padding: 4rem 2rem;
+  gap: 2.25rem;
+  padding: 3.5rem 1.5rem;
+}
+
+.title-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 #logo {
-  max-width: 560px;
-  width: 80%;
+  max-width: 440px;
+  width: 78%;
   height: auto;
   /* The logo image has a black background; screen blending drops it into the
      warm page background while keeping the bright splat. */
   mix-blend-mode: screen;
 }
 #logo-fallback {
-  font-size: 6rem;
-  letter-spacing: 0.6rem;
+  font-family: var(--font-display);
+  font-size: 5.5rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   margin: 0;
-  color: var(--accent);
+  color: var(--fg);
+}
+.tagline {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 1.15rem;
+  color: var(--muted);
+  margin: 0;
 }
 
 .menu-actions {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 0.85rem;
   width: 100%;
-  max-width: 420px;
+  max-width: 26rem;
 }
 
 .big-btn {
-  font-size: 1.5rem;
-  padding: 1.25rem 2.5rem;
   width: 100%;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.95rem 1.5rem;
+  color: var(--accent-fg);
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
+.big-btn:hover { background: var(--accent); color: var(--accent-fg); opacity: 0.92; }
+.big-btn.btn-secondary {
+  background: var(--surface-2);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+}
+.big-btn.btn-secondary:hover { background: var(--surface-2); color: var(--accent); opacity: 1; }
 
-#continue-section { width: 100%; max-width: 480px; }
+#continue-section { width: 100%; max-width: 26rem; }
 #continue-section h2 {
-  font-size: 1rem;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 600;
   color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.15rem;
+  letter-spacing: 0.02em;
   border-bottom: 1px solid var(--border);
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.4rem;
 }
 
 #program-list { list-style: none; padding: 0; margin: 0; }
@@ -129,19 +190,22 @@ body {
 .ref-syntax {
   display: block;
   color: var(--accent);
-  font-size: 1.05rem;
+  font-family: var(--font-mono);
+  font-size: 1rem;
   font-weight: bold;
 }
 .ref-desc { margin: 0.6rem 0; color: var(--fg); }
 .ref-example {
   display: block;
   color: var(--muted);
-  background: #1f140c;
+  background: #160f08;
   border: 1px solid var(--border);
   border-radius: 4px;
   padding: 0.5rem 0.7rem;
-  font-size: 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
 }
+.ref-note code, .ref-desc code { font-family: var(--font-mono); font-size: 0.9em; }
 .ref-note {
   color: var(--muted);
   border-top: 1px solid var(--border);
@@ -150,26 +214,25 @@ body {
 }
 .ref-note code { color: var(--accent); }
 
-/* ---------- Buttons ---------- */
+/* ---------- Buttons (editor toolbar etc.) ---------- */
 button {
-  background: var(--panel);
+  background: var(--surface-2);
   color: var(--fg);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: var(--radius);
   padding: 0.5rem 1rem;
-  font-family: inherit;
-  font-size: 0.9rem;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
   cursor: pointer;
 }
 button:hover { border-color: var(--accent); color: var(--accent); }
-button.primary, button.big-btn {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-button.primary:hover, button.big-btn:hover {
+button.primary {
   background: var(--accent);
-  color: var(--bg);
+  color: var(--accent-fg);
+  border-color: var(--accent);
+  font-weight: 600;
 }
+button.primary:hover { color: var(--accent-fg); opacity: 0.92; }
 
 /* ---------- Editor ---------- */
 #editor-view {
@@ -210,13 +273,14 @@ button.primary:hover, button.big-btn:hover {
 
 #code, #output {
   flex: 1;
-  background: var(--panel);
+  background: var(--surface);
   color: var(--fg);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: var(--radius);
   padding: 1rem;
-  font-family: inherit;
+  font-family: var(--font-mono);
   font-size: 0.95rem;
+  line-height: 1.5;
   resize: none;
   overflow: auto;
   white-space: pre-wrap;
@@ -231,7 +295,8 @@ button.primary:hover, button.big-btn:hover {
   border: none;
   border-bottom: 1px solid var(--accent);
   color: var(--accent);
-  font: inherit;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
   padding: 0 2px;
   min-width: 8ch;
 }

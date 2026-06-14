@@ -4,17 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Action</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <!-- ============ MENU VIEW ============ -->
   <section id="menu" class="view">
-    <img id="logo" src="logo.png" alt="Action" onerror="this.style.display='none';document.getElementById('logo-fallback').style.display='block'">
-    <h1 id="logo-fallback" style="display:none">ACTION</h1>
+    <div class="title-block">
+      <img id="logo" src="logo.png" alt="Action" onerror="this.style.display='none';document.getElementById('logo-fallback').style.display='block'">
+      <h1 id="logo-fallback" style="display:none">ACTION</h1>
+      <p class="tagline">A cosy little programming language.</p>
+    </div>
 
     <div class="menu-actions">
       <button id="new-btn" class="big-btn">Start a new code</button>
-      <button id="show-all-btn" class="big-btn">Commands</button>
+      <button id="show-all-btn" class="big-btn btn-secondary">Commands</button>
     </div>
 
     <div id="continue-section">
