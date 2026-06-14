@@ -282,3 +282,16 @@ button.primary:hover { color: var(--accent-fg); opacity: 0.92; }
 }
 #code:focus { outline: none; border-color: var(--accent); }
 #output { color: var(--accent); }
+
+/* Inline input field shown in the output when input() runs */
+.inline-input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--accent);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  padding: 0 2px;
+  min-width: 8ch;
+}
+.inline-input:focus { outline: none; }

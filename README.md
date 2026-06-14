@@ -84,7 +84,7 @@ input()
 
 `input()` reads a value while the program runs and stores it as `input` (read it
 back with `get(input)`). In the terminal you type it after `run()`; on the website
-a box pops up for your answer.
+you type your answer right in the output.
 
 
 ### Repeat
