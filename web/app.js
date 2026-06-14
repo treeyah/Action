@@ -137,9 +137,19 @@ async function runProgram() {
   const bytes = new TextEncoder().encode(feed);
   let pos = 0;
 
-  const appendText = (text) => {
-    outputEl.appendChild(document.createTextNode(text + "\n"));
+  // Append output exactly as the program emits it (raw newlines and all), so a
+  // question with no trailing newline stays on the same line as the answer.
+  const appendRaw = (text) => {
+    outputEl.appendChild(document.createTextNode(text));
     outputEl.scrollTop = outputEl.scrollHeight;
+  };
+
+  // stdout/stderr deliver one byte at a time; decode (UTF-8 stream-safe) and append.
+  const decoder = new TextDecoder();
+  const writeByte = (code) => {
+    if (code === null || code === undefined) return;
+    const text = decoder.decode(new Uint8Array([code]), { stream: true });
+    if (text) appendRaw(text);
   };
 
   // Inline input: show a text field where the cursor is and resolve on Enter.
@@ -166,14 +176,14 @@ async function runProgram() {
     await createActionModule({
       // stdin feeds the program lines + run() + exit(); input() uses readLine.
       stdin: () => (pos < bytes.length ? bytes[pos++] : null),
-      print: appendText,
-      printErr: appendText,
+      stdout: writeByte,
+      stderr: writeByte,
       readLine,
     });
   } catch (err) {
     // Emscripten throws an ExitStatus on exit(0); that's expected/clean.
     if (!(err && err.name === "ExitStatus")) {
-      appendText("[runtime error] " + (err && err.message ? err.message : err));
+      appendRaw("\n[runtime error] " + (err && err.message ? err.message : err));
     }
   }
 }
