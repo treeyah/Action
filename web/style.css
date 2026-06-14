@@ -217,3 +217,15 @@ button.primary:hover, button.big-btn:hover {
 }
 #code:focus { outline: none; border-color: var(--accent); }
 #output { color: var(--accent); }
+
+/* Inline input field shown in the output when input() runs */
+.inline-input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--accent);
+  color: var(--accent);
+  font: inherit;
+  padding: 0 2px;
+  min-width: 8ch;
+}
+.inline-input:focus { outline: none; }

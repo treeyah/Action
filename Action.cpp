@@ -8,6 +8,16 @@
 
 using namespace std;
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+// On the web, input() reads from an inline field in the output area instead of
+// stdin. This awaits the page (via ASYNCIFY) until the user submits a line.
+EM_ASYNC_JS(char *, web_read_line, (), {
+    const answer = await Module.readLine();
+    return stringToNewUTF8(answer);
+});
+#endif
+
 int main() {
     string c;
     vector<string> program;
@@ -139,8 +149,14 @@ int main() {
 
                 else if (line == "input()") {
                     string value;
+#ifdef __EMSCRIPTEN__
+                    cout.flush();
+                    char *p = web_read_line();
+                    value = p;
+                    free(p);
+#else
                     getline(cin, value);
-
+#endif
                     vars["input"] = value;
                 }
             }
