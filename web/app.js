@@ -119,73 +119,49 @@ document.getElementById("run-btn").addEventListener("click", runProgram);
 
 // ---------- Run via the WASM interpreter ----------
 // Action.cpp is an interactive stdin loop. We feed the editor's lines, then
-// run() to execute, then exit() to terminate the loop. Output is streamed live
-// into the output area as the program prints.
+// run() to execute, then exit() to terminate the loop, and capture stdout.
 //
-// input() pauses the program (via ASYNCIFY) and calls Module.readLine(), which
-// shows an inline text field in the output and resolves with what you type — so
-// you answer right in the output, terminal-style.
+// input(...) reads a line from stdin while running. We ask for each one with a
+// pop-up box up front and feed the answers right after run(), so the program
+// reads them in order and still terminates cleanly.
 async function runProgram() {
   const lines = codeEl.value
     .split("\n")
     .map((l) => l.trim())
     .filter((l) => l !== "" && l !== "run()" && l !== "exit()");
 
-  outputEl.replaceChildren(); // clear previous output
+  // One pop-up per input(...) command, in order. Show the question if given.
+  const answers = [];
+  for (const line of lines) {
+    if (/^input\(.*\)$/.test(line)) {
+      const question = line.slice(6, -1).trim();
+      const ans = prompt(question || "Input:");
+      answers.push(ans === null ? "" : ans);
+    }
+  }
 
-  const feed = lines.concat("run()", "exit()").join("\n") + "\n";
+  outputEl.textContent = "Running...\n";
+
+  const feed = lines.concat("run()", answers, "exit()").join("\n") + "\n";
   const bytes = new TextEncoder().encode(feed);
   let pos = 0;
-
-  // Append output exactly as the program emits it (raw newlines and all), so a
-  // question with no trailing newline stays on the same line as the answer.
-  const appendRaw = (text) => {
-    outputEl.appendChild(document.createTextNode(text));
-    outputEl.scrollTop = outputEl.scrollHeight;
-  };
-
-  // stdout/stderr deliver one byte at a time; decode (UTF-8 stream-safe) and append.
-  const decoder = new TextDecoder();
-  const writeByte = (code) => {
-    if (code === null || code === undefined) return;
-    const text = decoder.decode(new Uint8Array([code]), { stream: true });
-    if (text) appendRaw(text);
-  };
-
-  // Inline input: show a text field where the cursor is and resolve on Enter.
-  const readLine = () =>
-    new Promise((resolve) => {
-      const field = document.createElement("input");
-      field.type = "text";
-      field.className = "inline-input";
-      field.setAttribute("aria-label", "Program input");
-      outputEl.appendChild(field);
-      field.focus();
-      outputEl.scrollTop = outputEl.scrollHeight;
-      field.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          const val = field.value;
-          field.replaceWith(document.createTextNode(val + "\n"));
-          resolve(val);
-        }
-      });
-    });
+  const out = [];
 
   try {
     await createActionModule({
-      // stdin feeds the program lines + run() + exit(); input() uses readLine.
+      // stdin: return next byte or null at EOF
       stdin: () => (pos < bytes.length ? bytes[pos++] : null),
-      stdout: writeByte,
-      stderr: writeByte,
-      readLine,
+      print: (text) => out.push(text),
+      printErr: (text) => out.push(text),
     });
   } catch (err) {
     // Emscripten throws an ExitStatus on exit(0); that's expected/clean.
     if (!(err && err.name === "ExitStatus")) {
-      appendRaw("\n[runtime error] " + (err && err.message ? err.message : err));
+      out.push("[runtime error] " + (err && err.message ? err.message : err));
     }
   }
+
+  outputEl.textContent = out.join("\n").replace(/^\n+/, "");
 }
 
 // ---------- Init ----------

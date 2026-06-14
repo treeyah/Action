@@ -17,8 +17,6 @@ fi
 emcc Action.cpp -O2 -o web/action.js \
   -sMODULARIZE=1 \
   -sEXPORT_NAME=createActionModule \
-  -sENVIRONMENT=web \
-  -sASYNCIFY \
-  -sEXPORTED_RUNTIME_METHODS=stringToNewUTF8
+  -sENVIRONMENT=web
 
 echo "Built web/action.js + web/action.wasm"
