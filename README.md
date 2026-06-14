@@ -79,13 +79,12 @@ divide(a/b)
 
 set(name=value)
 get(name)
-input(question)
+input()
 
 
-`input(question)` prints the question, then reads a value while the program runs
-and stores it as `input` (read it back with `get(input)`). In the terminal you
-type it after `run()`; on the website a box pops up for your answer. Plain
-`input()` with no question also works.
+`input()` reads a value while the program runs and stores it as `input` (read it
+back with `get(input)`). In the terminal you type it after `run()`; on the website
+a box pops up for your answer.
 
 
 ### Repeat

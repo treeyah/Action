@@ -130,12 +130,11 @@ async function runProgram() {
     .map((l) => l.trim())
     .filter((l) => l !== "" && l !== "run()" && l !== "exit()");
 
-  // One pop-up per input(...) command, in order. Show the question if given.
+  // One pop-up per input() command, in order.
   const answers = [];
   for (const line of lines) {
-    if (/^input\(.*\)$/.test(line)) {
-      const question = line.slice(6, -1).trim();
-      const ans = prompt(question || "Input:");
+    if (line === "input()") {
+      const ans = prompt("Input:");
       answers.push(ans === null ? "" : ans);
     }
   }

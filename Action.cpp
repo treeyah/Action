@@ -137,13 +137,7 @@ int main() {
                     repeatCount = 1;
                 }
 
-                else if (line.find("input(") == 0) {
-                    string question = line.substr(6, line.size() - 7);
-                    cout << question;
-                    if (!question.empty()) {
-                        cout << " ";
-                    }
-
+                else if (line == "input()") {
                     string value;
                     getline(cin, value);
 
