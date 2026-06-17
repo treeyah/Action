@@ -130,11 +130,9 @@ const EXAMPLES = [
   },
   {
     name: "Dice roller",
-    desc: "Roll two dice and show the results.",
+    desc: "Roll a dice and show the result.",
     code: [
       "write(You rolled:)",
-      "newline()",
-      "random(1,6)",
       "newline()",
       "random(1,6)",
     ].join("\n"),
