@@ -265,6 +265,13 @@ button.primary:hover { color: var(--accent-fg); opacity: 0.92; }
   margin-bottom: 0.4rem;
 }
 
+.code-wrap {
+  position: relative;
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
 #code, #output {
   flex: 1;
   background: var(--surface);
@@ -282,6 +289,46 @@ button.primary:hover { color: var(--accent-fg); opacity: 0.92; }
 }
 #code:focus { outline: none; border-color: var(--accent); }
 #output { color: var(--accent); }
+
+/* Autocomplete popup (VSCode-style command suggestions) */
+.autocomplete {
+  position: absolute;
+  z-index: 50;
+  margin: 0;
+  padding: 0.25rem;
+  list-style: none;
+  background: var(--surface-2);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  max-height: 14rem;
+  overflow-y: auto;
+  min-width: 16rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+}
+.autocomplete li {
+  padding: 0.4rem 0.6rem;
+  border-radius: calc(var(--radius) - 0.15rem);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+.autocomplete li .ac-name { color: var(--accent); }
+.autocomplete li .ac-desc {
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+}
+.autocomplete li.active,
+.autocomplete li:hover {
+  background: var(--accent);
+}
+.autocomplete li.active .ac-name,
+.autocomplete li:hover .ac-name { color: var(--accent-fg); }
+.autocomplete li.active .ac-desc,
+.autocomplete li:hover .ac-desc { color: var(--accent-fg); opacity: 0.85; }
 
 /* Inline input field shown in the output when input() runs */
 .inline-input {

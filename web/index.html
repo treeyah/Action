@@ -116,12 +116,15 @@
     <div class="panes">
       <div class="pane">
         <label class="pane-label">Code</label>
-        <textarea id="code" spellcheck="false" placeholder="write(Hello)
+        <div class="code-wrap">
+          <textarea id="code" spellcheck="false" placeholder="write(Hello)
 set(user=Ben)
 get(user)
 add(10+5)
 repeat(2)
 write(Hi)"></textarea>
+          <ul id="autocomplete" class="autocomplete" hidden></ul>
+        </div>
       </div>
       <div class="pane">
         <label class="pane-label">Output</label>

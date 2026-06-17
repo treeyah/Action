@@ -184,5 +184,130 @@ async function runProgram() {
   }
 }
 
+// ---------- Autocomplete (VSCode-style command suggestions) ----------
+const acEl = document.getElementById("autocomplete");
+
+// Each command: the word, what to insert, where to put the cursor in the
+// inserted text (caret), and a short description.
+const COMMANDS = [
+  { word: "write",   insert: "write()",    caret: 6, desc: "Print text" },
+  { word: "add",     insert: "add()",      caret: 4, desc: "a + b" },
+  { word: "minus",   insert: "minus()",    caret: 6, desc: "a - b" },
+  { word: "times",   insert: "times()",    caret: 6, desc: "a * b" },
+  { word: "divide",  insert: "divide()",   caret: 7, desc: "a / b" },
+  { word: "set",     insert: "set()",      caret: 4, desc: "Store a variable (name=value)" },
+  { word: "get",     insert: "get()",      caret: 4, desc: "Print a variable" },
+  { word: "random",  insert: "random()",   caret: 7, desc: "Random number (min,max)" },
+  { word: "repeat",  insert: "repeat()",   caret: 7, desc: "Repeat the next command" },
+  { word: "newline", insert: "newline()",  caret: 9, desc: "Start a new line" },
+  { word: "input",   insert: "input()",    caret: 7, desc: "Ask for a value" },
+];
+
+let acMatches = [];
+let acActive = 0;
+let acWordStart = 0; // index in textarea where the typed word begins
+
+function hideAutocomplete() {
+  acEl.hidden = true;
+  acMatches = [];
+}
+
+// Measure the pixel position of the caret inside the textarea via a mirror div.
+function caretCoords() {
+  const pos = codeEl.selectionStart;
+  const mirror = document.createElement("div");
+  const cs = getComputedStyle(codeEl);
+  for (const p of [
+    "boxSizing", "width", "paddingTop", "paddingRight", "paddingBottom",
+    "paddingLeft", "borderWidth", "fontFamily", "fontSize", "fontWeight",
+    "lineHeight", "letterSpacing", "whiteSpace", "wordWrap", "tabSize",
+  ]) {
+    mirror.style[p] = cs[p];
+  }
+  mirror.style.position = "absolute";
+  mirror.style.visibility = "hidden";
+  mirror.style.whiteSpace = "pre-wrap";
+  mirror.style.wordWrap = "break-word";
+  mirror.textContent = codeEl.value.slice(0, pos);
+  const marker = document.createElement("span");
+  marker.textContent = "​";
+  mirror.appendChild(marker);
+  codeEl.parentElement.appendChild(mirror);
+  const top = marker.offsetTop - codeEl.scrollTop + marker.offsetHeight;
+  const left = marker.offsetLeft - codeEl.scrollLeft;
+  mirror.remove();
+  return { top, left };
+}
+
+function renderAutocomplete() {
+  acEl.replaceChildren();
+  acMatches.forEach((cmd, i) => {
+    const li = document.createElement("li");
+    if (i === acActive) li.className = "active";
+    const name = document.createElement("span");
+    name.className = "ac-name";
+    name.textContent = cmd.insert;
+    const desc = document.createElement("span");
+    desc.className = "ac-desc";
+    desc.textContent = cmd.desc;
+    li.append(name, desc);
+    li.addEventListener("mousedown", (e) => {
+      e.preventDefault(); // keep textarea focus
+      applyAutocomplete(cmd);
+    });
+    acEl.appendChild(li);
+  });
+  const { top, left } = caretCoords();
+  acEl.style.top = top + "px";
+  acEl.style.left = left + "px";
+  acEl.hidden = false;
+}
+
+function applyAutocomplete(cmd) {
+  const value = codeEl.value;
+  const before = value.slice(0, acWordStart);
+  const after = value.slice(codeEl.selectionStart);
+  codeEl.value = before + cmd.insert + after;
+  const caret = before.length + cmd.caret;
+  codeEl.setSelectionRange(caret, caret);
+  hideAutocomplete();
+  codeEl.focus();
+}
+
+function updateAutocomplete() {
+  const pos = codeEl.selectionStart;
+  // The word being typed: letters immediately before the caret.
+  const upto = codeEl.value.slice(0, pos);
+  const m = upto.match(/[a-zA-Z]+$/);
+  if (!m) return hideAutocomplete();
+  const word = m[0].toLowerCase();
+  acWordStart = pos - m[0].length;
+  acMatches = COMMANDS.filter((c) => c.word.startsWith(word) && c.word !== word);
+  if (acMatches.length === 0) return hideAutocomplete();
+  acActive = 0;
+  renderAutocomplete();
+}
+
+codeEl.addEventListener("input", updateAutocomplete);
+codeEl.addEventListener("keydown", (e) => {
+  if (acEl.hidden) return;
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    acActive = (acActive + 1) % acMatches.length;
+    renderAutocomplete();
+  } else if (e.key === "ArrowUp") {
+    e.preventDefault();
+    acActive = (acActive - 1 + acMatches.length) % acMatches.length;
+    renderAutocomplete();
+  } else if (e.key === "Enter" || e.key === "Tab") {
+    e.preventDefault();
+    applyAutocomplete(acMatches[acActive]);
+  } else if (e.key === "Escape") {
+    hideAutocomplete();
+  }
+});
+codeEl.addEventListener("blur", () => setTimeout(hideAutocomplete, 100));
+codeEl.addEventListener("scroll", hideAutocomplete);
+
 // ---------- Init ----------
 showMenu();
