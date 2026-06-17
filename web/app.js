@@ -197,6 +197,7 @@ const COMMANDS = [
   { word: "divide",  insert: "divide()",   caret: 7, desc: "a / b" },
   { word: "set",     insert: "set()",      caret: 4, desc: "Store a variable (name=value)" },
   { word: "get",     insert: "get()",      caret: 4, desc: "Print a variable" },
+  { word: "get",     insert: "get(input)", caret: 10, desc: "Print the input variable" },
   { word: "random",  insert: "random()",   caret: 7, desc: "Random number (min,max)" },
   { word: "repeat",  insert: "repeat()",   caret: 7, desc: "Repeat the next command" },
   { word: "newline", insert: "newline()",  caret: 9, desc: "Start a new line" },
@@ -276,13 +277,21 @@ function applyAutocomplete(cmd) {
 
 function updateAutocomplete() {
   const pos = codeEl.selectionStart;
-  // The word being typed: letters immediately before the caret.
   const upto = codeEl.value.slice(0, pos);
+
+  // Don't suggest commands while typing inside brackets — there you type
+  // literal text or values (e.g. write(Hello), set(name=value)), not commands.
+  const lineUpto = upto.slice(upto.lastIndexOf("\n") + 1);
+  const opens = (lineUpto.match(/\(/g) || []).length;
+  const closes = (lineUpto.match(/\)/g) || []).length;
+  if (opens > closes) return hideAutocomplete();
+
+  // The word being typed: letters immediately before the caret.
   const m = upto.match(/[a-zA-Z]+$/);
   if (!m) return hideAutocomplete();
   const word = m[0].toLowerCase();
   acWordStart = pos - m[0].length;
-  acMatches = COMMANDS.filter((c) => c.word.startsWith(word) && c.word !== word);
+  acMatches = COMMANDS.filter((c) => c.word.startsWith(word) && c.insert !== word);
   if (acMatches.length === 0) return hideAutocomplete();
   acActive = 0;
   renderAutocomplete();
