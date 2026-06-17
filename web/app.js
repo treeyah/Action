@@ -158,13 +158,14 @@ const EXAMPLES = [
   },
   {
     name: "Ask and answer",
-    desc: "Ask a question and repeat the answer back.",
+    desc: "Ask a question and react to the answer.",
     code: [
       "write(What is your favourite animal?)",
       "newline()",
       "input()",
-      "write(You said: )",
+      "write(Wow, the )",
       "get(input)",
+      "write( is a great animal!)",
     ].join("\n"),
   },
 ];
