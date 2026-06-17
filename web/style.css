@@ -208,6 +208,62 @@ body::before {
 }
 .ref-note code { color: var(--accent); }
 
+/* ---------- Examples gallery ---------- */
+#examples-view {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 1rem;
+  gap: 1rem;
+}
+#examples-list {
+  flex: 1;
+  overflow: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  align-content: start;
+}
+.example-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.example-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+}
+.example-card-header .name {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--accent);
+}
+.example-card .desc {
+  color: var(--muted);
+  margin: 0;
+  padding: 0.6rem 0.9rem 0;
+  font-size: 0.95rem;
+}
+.example-card pre {
+  margin: 0.6rem 0.9rem 0.9rem;
+  padding: 0.7rem;
+  background: #160f08;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  overflow: auto;
+  max-height: 11rem;
+}
+
 /* ---------- Buttons (editor toolbar etc.) ---------- */
 button {
   background: var(--surface-2);

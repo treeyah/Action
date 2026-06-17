@@ -4,6 +4,8 @@
 const menu = document.getElementById("menu");
 const editorView = document.getElementById("editor-view");
 const galleryView = document.getElementById("gallery-view");
+const examplesView = document.getElementById("examples-view");
+const examplesList = document.getElementById("examples-list");
 const programList = document.getElementById("program-list");
 const noPrograms = document.getElementById("no-programs");
 const codeEl = document.getElementById("code");
@@ -28,17 +30,28 @@ function savePrograms(programs) {
 }
 
 // ---------- View switching ----------
-function showMenu() {
+function hideAllViews() {
+  menu.hidden = true;
   editorView.hidden = true;
   galleryView.hidden = true;
+  examplesView.hidden = true;
+}
+
+function showMenu() {
+  hideAllViews();
   menu.hidden = false;
   renderProgramList();
 }
 
 function showCommands() {
-  menu.hidden = true;
-  editorView.hidden = true;
+  hideAllViews();
   galleryView.hidden = false;
+}
+
+function showExamples() {
+  hideAllViews();
+  examplesView.hidden = false;
+  renderExamples();
 }
 
 function showEditor(name, code) {
@@ -46,7 +59,7 @@ function showEditor(name, code) {
   programNameEl.textContent = name;
   codeEl.value = code || "";
   outputEl.textContent = "";
-  menu.hidden = true;
+  hideAllViews();
   editorView.hidden = false;
   codeEl.focus();
 }
@@ -96,9 +109,97 @@ document.getElementById("new-btn").addEventListener("click", () => {
 });
 
 document.getElementById("show-all-btn").addEventListener("click", showCommands);
+document.getElementById("examples-btn").addEventListener("click", showExamples);
 
 // ---------- Commands reference actions ----------
 document.getElementById("gallery-back-btn").addEventListener("click", showMenu);
+
+// ---------- Examples ----------
+const EXAMPLES = [
+  {
+    name: "Greeting",
+    desc: "Ask for your name, then say hello.",
+    code: [
+      "write(What is your name?)",
+      "newline()",
+      "input()",
+      "write(Hello, )",
+      "get(input)",
+      "write(!)",
+    ].join("\n"),
+  },
+  {
+    name: "Dice roller",
+    desc: "Roll two dice and show the results.",
+    code: [
+      "write(You rolled:)",
+      "newline()",
+      "random(1,6)",
+      "newline()",
+      "random(1,6)",
+    ].join("\n"),
+  },
+  {
+    name: "Maths fun",
+    desc: "Show a few calculations.",
+    code: [
+      "write(10 + 5 = )",
+      "add(10+5)",
+      "newline()",
+      "write(6 x 7 = )",
+      "times(6*7)",
+      "newline()",
+      "write(20 / 4 = )",
+      "divide(20/4)",
+    ].join("\n"),
+  },
+  {
+    name: "Repeat fun",
+    desc: "Print the same thing several times.",
+    code: ["repeat(5)", "write(Action! )"].join("\n"),
+  },
+  {
+    name: "Ask and answer",
+    desc: "Ask a question and repeat the answer back.",
+    code: [
+      "write(What is your favourite animal?)",
+      "newline()",
+      "input()",
+      "write(You said: )",
+      "get(input)",
+    ].join("\n"),
+  },
+];
+
+function renderExamples() {
+  examplesList.replaceChildren();
+  for (const ex of EXAMPLES) {
+    const card = document.createElement("div");
+    card.className = "example-card";
+
+    const header = document.createElement("div");
+    header.className = "example-card-header";
+    const name = document.createElement("span");
+    name.className = "name";
+    name.textContent = ex.name;
+    const open = document.createElement("button");
+    open.textContent = "Try it";
+    open.addEventListener("click", () => showEditor(ex.name, ex.code));
+    header.append(name, open);
+
+    const desc = document.createElement("p");
+    desc.className = "desc";
+    desc.textContent = ex.desc;
+
+    const pre = document.createElement("pre");
+    pre.textContent = ex.code;
+
+    card.append(header, desc, pre);
+    examplesList.appendChild(card);
+  }
+}
+
+document.getElementById("examples-back-btn").addEventListener("click", showMenu);
 
 // ---------- Editor actions ----------
 document.getElementById("back-btn").addEventListener("click", showMenu);

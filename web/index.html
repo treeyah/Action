@@ -19,6 +19,7 @@
 
     <div class="menu-actions">
       <button id="new-btn" class="big-btn">Start a new code</button>
+      <button id="examples-btn" class="big-btn btn-secondary">Examples</button>
       <button id="show-all-btn" class="big-btn btn-secondary">Commands</button>
     </div>
 
@@ -99,6 +100,15 @@
       Output is printed on the same line &mdash; use <code>newline()</code> to start a new line.
       You don't need to type <code>run()</code> &mdash; the Run button does that for you.
     </p>
+  </section>
+
+  <!-- ============ EXAMPLES VIEW ============ -->
+  <section id="examples-view" class="view" hidden>
+    <header class="editor-header">
+      <button id="examples-back-btn">&larr; Menu</button>
+      <span class="program-name">Examples</span>
+    </header>
+    <div id="examples-list"></div>
   </section>
 
   <!-- ============ EDITOR VIEW ============ -->
