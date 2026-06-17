@@ -321,8 +321,15 @@ button.primary:hover { color: var(--accent-fg); opacity: 0.92; }
   font-family: var(--font-body);
   font-size: 0.85rem;
 }
+.autocomplete li.ac-empty {
+  color: var(--muted);
+  font-style: italic;
+  cursor: default;
+}
+.autocomplete li.ac-empty:hover { background: transparent; }
+
 .autocomplete li.active,
-.autocomplete li:hover {
+.autocomplete li:not(.ac-empty):hover {
   background: var(--accent);
 }
 .autocomplete li.active .ac-name,

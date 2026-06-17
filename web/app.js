@@ -292,14 +292,32 @@ function updateAutocomplete() {
   const word = m[0].toLowerCase();
   acWordStart = pos - m[0].length;
   acMatches = COMMANDS.filter((c) => c.word.startsWith(word) && c.insert !== word);
-  if (acMatches.length === 0) return hideAutocomplete();
+  if (acMatches.length === 0) return renderNoMatch();
   acActive = 0;
   renderAutocomplete();
+}
+
+function renderNoMatch() {
+  acMatches = [];
+  acEl.replaceChildren();
+  const li = document.createElement("li");
+  li.className = "ac-empty";
+  li.textContent = "No code found";
+  acEl.appendChild(li);
+  const { top, left } = caretCoords();
+  acEl.style.top = top + "px";
+  acEl.style.left = left + "px";
+  acEl.hidden = false;
 }
 
 codeEl.addEventListener("input", updateAutocomplete);
 codeEl.addEventListener("keydown", (e) => {
   if (acEl.hidden) return;
+  // "No code found" is showing — nothing to select, just allow normal typing.
+  if (acMatches.length === 0) {
+    if (e.key === "Escape") hideAutocomplete();
+    return;
+  }
   if (e.key === "ArrowDown") {
     e.preventDefault();
     acActive = (acActive + 1) % acMatches.length;
