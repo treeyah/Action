@@ -9,6 +9,8 @@ const examplesList = document.getElementById("examples-list");
 const programList = document.getElementById("program-list");
 const noPrograms = document.getElementById("no-programs");
 const codeEl = document.getElementById("code");
+const highlightEl = document.getElementById("highlight");
+const gutterEl = document.getElementById("gutter");
 const outputEl = document.getElementById("output");
 const programNameEl = document.getElementById("program-name");
 
@@ -61,6 +63,7 @@ function showEditor(name, code) {
   outputEl.textContent = "";
   hideAllViews();
   editorView.hidden = false;
+  refreshEditor();
   codeEl.focus();
 }
 
@@ -224,13 +227,42 @@ document.getElementById("run-btn").addEventListener("click", runProgram);
 // input() reads inline: the web build pauses the program and calls
 // Module.readLine(), which shows a text field in the output and resolves with
 // what you type — so you answer right in the output, terminal-style.
+// A line the interpreter understands: a known command followed by (...).
+const RECOGNISED = /^(write|add|minus|times|divide|set|get|random|repeat|newline|input|run|list|clear|exit)\(.*\)$/;
+
+// Friendly checks before running, so mistakes don't fail silently.
+function findProblems(rawLines) {
+  const problems = [];
+  rawLines.forEach((raw, i) => {
+    const line = raw.trim();
+    if (line === "") return;
+    if (!RECOGNISED.test(line)) {
+      const name = line.match(/^[A-Za-z]+/);
+      if (name && KEYWORDS.has(name[0])) {
+        problems.push(`Line ${i + 1}: "${line}" — check the brackets, e.g. ${name[0]}(...)`);
+      } else {
+        problems.push(`Line ${i + 1}: I don't know the command "${line}"`);
+      }
+    }
+  });
+  return problems;
+}
+
 async function runProgram() {
-  const lines = codeEl.value
-    .split("\n")
+  const rawLines = codeEl.value.split("\n");
+  const lines = rawLines
     .map((l) => l.trim())
     .filter((l) => l !== "" && l !== "run()" && l !== "exit()");
 
   outputEl.replaceChildren(); // clear previous output
+
+  // Show any friendly warnings first, then run what we can.
+  for (const p of findProblems(rawLines)) {
+    const warn = document.createElement("span");
+    warn.className = "warn";
+    warn.textContent = "⚠ " + p + "\n";
+    outputEl.appendChild(warn);
+  }
 
   const feed = lines.concat("run()", "exit()").join("\n") + "\n";
   const bytes = new TextEncoder().encode(feed);
@@ -282,6 +314,55 @@ async function runProgram() {
       appendRaw("\n[runtime error] " + (err && err.message ? err.message : err));
     }
   }
+}
+
+// ---------- Syntax highlighting + line numbers ----------
+const KEYWORDS = new Set([
+  "write", "add", "minus", "times", "divide", "set", "get", "random",
+  "repeat", "newline", "input", "run", "list", "clear", "exit",
+]);
+
+function escapeHtml(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+// Colour command names (when they look like a call) and numbers.
+function highlightCode(src) {
+  let out = "";
+  const re = /([A-Za-z]+)|([0-9]+)|(\n)|([^A-Za-z0-9\n]+)/g;
+  let m;
+  while ((m = re.exec(src))) {
+    if (m[1] !== undefined) {
+      const w = m[1];
+      if (KEYWORDS.has(w) && src[re.lastIndex] === "(") {
+        out += `<span class="tok-cmd">${escapeHtml(w)}</span>`;
+      } else {
+        out += escapeHtml(w);
+      }
+    } else if (m[2] !== undefined) {
+      out += `<span class="tok-num">${m[2]}</span>`;
+    } else if (m[3] !== undefined) {
+      out += "\n";
+    } else {
+      out += escapeHtml(m[4]);
+    }
+  }
+  return out;
+}
+
+function syncScroll() {
+  highlightEl.scrollTop = codeEl.scrollTop;
+  highlightEl.scrollLeft = codeEl.scrollLeft;
+  gutterEl.scrollTop = codeEl.scrollTop;
+}
+
+function refreshEditor() {
+  highlightEl.innerHTML = highlightCode(codeEl.value) + "\n";
+  const count = codeEl.value.split("\n").length;
+  let nums = "";
+  for (let i = 1; i <= count; i++) nums += i + "\n";
+  gutterEl.textContent = nums;
+  syncScroll();
 }
 
 // ---------- Autocomplete (VSCode-style command suggestions) ----------
@@ -372,6 +453,7 @@ function applyAutocomplete(cmd) {
   const caret = before.length + cmd.caret;
   codeEl.setSelectionRange(caret, caret);
   hideAutocomplete();
+  refreshEditor();
   codeEl.focus();
 }
 
@@ -410,8 +492,18 @@ function renderNoMatch() {
   acEl.hidden = false;
 }
 
-codeEl.addEventListener("input", updateAutocomplete);
+codeEl.addEventListener("input", () => {
+  refreshEditor();
+  updateAutocomplete();
+});
 codeEl.addEventListener("keydown", (e) => {
+  // Run shortcut: Ctrl/Cmd+Enter runs the program from anywhere in the editor.
+  if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+    e.preventDefault();
+    hideAutocomplete();
+    runProgram();
+    return;
+  }
   if (acEl.hidden) return;
   // "No code found" is showing — nothing to select, just allow normal typing.
   if (acMatches.length === 0) {
@@ -434,7 +526,10 @@ codeEl.addEventListener("keydown", (e) => {
   }
 });
 codeEl.addEventListener("blur", () => setTimeout(hideAutocomplete, 100));
-codeEl.addEventListener("scroll", hideAutocomplete);
+codeEl.addEventListener("scroll", () => {
+  syncScroll();
+  hideAutocomplete();
+});
 
 // ---------- Init ----------
 showMenu();

@@ -326,12 +326,69 @@ button.primary:hover { color: var(--accent-fg); opacity: 0.92; }
   flex: 1;
   display: flex;
   min-height: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.code-wrap:focus-within { border-color: var(--accent); }
+
+/* Line-number gutter */
+.gutter {
+  flex: 0 0 auto;
+  min-width: 2.5ch;
+  padding: 1rem 0.5rem 1rem 0.75rem;
+  text-align: right;
+  color: var(--muted);
+  background: rgba(0, 0, 0, 0.18);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  white-space: pre;
+  overflow: hidden;
+  user-select: none;
 }
 
-#code, #output {
+/* The textarea and the colour layer are stacked exactly on top of each other */
+.code-stack { position: relative; flex: 1; min-height: 0; }
+
+#code, #highlight {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  border: 0;
+  padding: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow: auto;
+}
+/* Colour layer behind: shows the highlighted code */
+#highlight {
+  z-index: 0;
+  background: transparent;
+  color: var(--fg);
+  pointer-events: none;
+}
+#highlight .tok-cmd { color: var(--accent); font-weight: bold; }
+#highlight .tok-num { color: #9ec98a; }
+/* Textarea on top: transparent text so the colour layer shows, caret visible */
+#code {
+  z-index: 1;
+  background: transparent;
+  color: transparent;
+  caret-color: var(--accent);
+  resize: none;
+}
+#code:focus { outline: none; }
+#code::placeholder { color: var(--muted); }
+
+#output {
   flex: 1;
   background: var(--surface);
-  color: var(--fg);
+  color: var(--accent);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 1rem;
@@ -343,8 +400,7 @@ button.primary:hover { color: var(--accent-fg); opacity: 0.92; }
   white-space: pre-wrap;
   margin: 0;
 }
-#code:focus { outline: none; border-color: var(--accent); }
-#output { color: var(--accent); }
+#output .warn { color: #e6a86b; font-style: italic; }
 
 /* Autocomplete popup (VSCode-style command suggestions) */
 .autocomplete {
