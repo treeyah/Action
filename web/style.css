@@ -372,8 +372,19 @@ button.primary:hover { color: var(--accent-fg); opacity: 0.92; }
   color: var(--fg);
   pointer-events: none;
 }
-#highlight .tok-cmd { color: var(--accent); font-weight: bold; }
-#highlight .tok-num { color: #9ec98a; }
+/* Each command category gets its own colour */
+#highlight .tok-write   { color: #e0a85c; } /* write — gold */
+#highlight .tok-math    { color: #88c98a; } /* add/minus/times/divide — green */
+#highlight .tok-var     { color: #6fb4e6; } /* set/get — blue */
+#highlight .tok-random  { color: #cf8fd9; } /* random — purple */
+#highlight .tok-repeat  { color: #ef9b63; } /* repeat — orange */
+#highlight .tok-newline { color: #54c8b4; } /* newline — teal */
+#highlight .tok-input   { color: #e6d264; } /* input — yellow */
+#highlight .tok-meta    { color: var(--muted); } /* run/list/clear/exit */
+/* Inside the brackets */
+#highlight .tok-punc    { color: #f0c674; } /* brackets and + - * / = , */
+#highlight .tok-arg     { color: #ece0c8; } /* text inside brackets — soft cream */
+#highlight .tok-num     { color: #e89a9a; } /* numbers — rose */
 /* Textarea on top: transparent text so the colour layer shows, caret visible */
 #code {
   z-index: 1;

@@ -230,19 +230,89 @@ document.getElementById("run-btn").addEventListener("click", runProgram);
 // A line the interpreter understands: a known command followed by (...).
 const RECOGNISED = /^(write|add|minus|times|divide|set|get|random|repeat|newline|input|run|list|clear|exit)\(.*\)$/;
 
+// How many single-character edits turn a into b (for "did you mean?").
+function editDistance(a, b) {
+  const d = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+  for (let j = 0; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
+    }
+  }
+  return d[a.length][b.length];
+}
+
+// The closest command to a typed word, if it's a near miss.
+function closestCommand(word) {
+  let best = null;
+  let bestDist = 3; // only suggest if it's reasonably close
+  for (const cmd of KEYWORDS) {
+    const dist = editDistance(word, cmd);
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = cmd;
+    }
+  }
+  return best;
+}
+
+// Check the values inside a recognised command (e.g. whole-numbers-only math).
+function checkArgs(line) {
+  const m = line.match(/^([a-z]+)\((.*)\)$/);
+  if (!m) return null;
+  const cmd = m[1];
+  const arg = m[2];
+
+  if (["add", "minus", "times", "divide"].includes(cmd)) {
+    const op = { add: "+", minus: "-", times: "*", divide: "/" }[cmd];
+    if (arg.includes(".")) return "whole numbers only (no decimals)";
+    const re = new RegExp("^-?\\d+\\" + op + "-?\\d+$");
+    if (!re.test(arg)) return `whole numbers only — try ${cmd}(2${op}3)`;
+  } else if (cmd === "random") {
+    if (arg.includes(".")) return "whole numbers only — try random(1,6)";
+    if (!/^-?\d+,-?\d+$/.test(arg)) return "random needs two whole numbers, like random(1,6)";
+  } else if (cmd === "repeat") {
+    if (!/^\d+$/.test(arg)) return "repeat needs a whole number, like repeat(3)";
+  }
+  return null;
+}
+
 // Friendly checks before running, so mistakes don't fail silently.
 function findProblems(rawLines) {
   const problems = [];
   rawLines.forEach((raw, i) => {
     const line = raw.trim();
     if (line === "") return;
-    if (!RECOGNISED.test(line)) {
-      const name = line.match(/^[A-Za-z]+/);
-      if (name && KEYWORDS.has(name[0])) {
-        problems.push(`Line ${i + 1}: "${line}" — check the brackets, e.g. ${name[0]}(...)`);
-      } else {
-        problems.push(`Line ${i + 1}: I don't know the command "${line}"`);
-      }
+
+    const at = `Line ${i + 1}`;
+    const nameMatch = line.match(/^[A-Za-z]+/);
+    const name = nameMatch ? nameMatch[0] : "";
+    const lower = name.toLowerCase();
+
+    // Capital letters in a command name (commands are all lowercase).
+    if (name && lower !== name && KEYWORDS.has(lower)) {
+      problems.push(`${at}: no capital letters — try ${lower}(...)`);
+      return;
+    }
+
+    // Structurally fine — just check the values inside.
+    if (RECOGNISED.test(line)) {
+      const argMsg = checkArgs(line);
+      if (argMsg) problems.push(`${at}: ${argMsg}`);
+      return;
+    }
+
+    if (name && KEYWORDS.has(lower)) {
+      problems.push(`${at}: "${lower}" needs round brackets — try ${lower}(...)`);
+    } else if (name) {
+      const guess = closestCommand(lower);
+      const hint = guess
+        ? ` Did you mean ${guess}()?`
+        : ` Tap "Commands" to see what you can use.`;
+      problems.push(`${at}: "${name}" isn't a command I know.${hint}`);
+    } else {
+      problems.push(`${at}: I couldn't read "${line}". Commands look like name(...)`);
     }
   });
   return problems;
@@ -317,25 +387,39 @@ async function runProgram() {
 }
 
 // ---------- Syntax highlighting + line numbers ----------
-const KEYWORDS = new Set([
-  "write", "add", "minus", "times", "divide", "set", "get", "random",
-  "repeat", "newline", "input", "run", "list", "clear", "exit",
-]);
+// Each command is coloured by category (see the matching CSS classes).
+const TOKEN_CLASS = {
+  write: "tok-write",
+  add: "tok-math", minus: "tok-math", times: "tok-math", divide: "tok-math",
+  set: "tok-var", get: "tok-var",
+  random: "tok-random",
+  repeat: "tok-repeat",
+  newline: "tok-newline",
+  input: "tok-input",
+  run: "tok-meta", list: "tok-meta", clear: "tok-meta", exit: "tok-meta",
+};
+const KEYWORDS = new Set(Object.keys(TOKEN_CLASS));
 
 function escapeHtml(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-// Colour command names (when they look like a call) and numbers.
+// Colour the whole line VSCode-style: command name by category, the brackets,
+// and everything inside them (text, numbers, operators).
 function highlightCode(src) {
   let out = "";
-  const re = /([A-Za-z]+)|([0-9]+)|(\n)|([^A-Za-z0-9\n]+)/g;
+  let depth = 0; // how many brackets deep we are
+  const re = /([A-Za-z]+)|([0-9]+)|(\n)|([^A-Za-z0-9\n])/g;
   let m;
   while ((m = re.exec(src))) {
     if (m[1] !== undefined) {
       const w = m[1];
-      if (KEYWORDS.has(w) && src[re.lastIndex] === "(") {
-        out += `<span class="tok-cmd">${escapeHtml(w)}</span>`;
+      if (KEYWORDS.has(w)) {
+        // A command word always keeps its category colour, anywhere it appears.
+        out += `<span class="${TOKEN_CLASS[w]}">${escapeHtml(w)}</span>`;
+      } else if (depth > 0) {
+        // Other text inside brackets is plain cream.
+        out += `<span class="tok-arg">${escapeHtml(w)}</span>`;
       } else {
         out += escapeHtml(w);
       }
@@ -344,7 +428,18 @@ function highlightCode(src) {
     } else if (m[3] !== undefined) {
       out += "\n";
     } else {
-      out += escapeHtml(m[4]);
+      const ch = m[4];
+      if (ch === "(") {
+        depth++;
+        out += `<span class="tok-punc">(</span>`;
+      } else if (ch === ")") {
+        if (depth > 0) depth--;
+        out += `<span class="tok-punc">)</span>`;
+      } else if ("+-*/=,".includes(ch)) {
+        out += `<span class="tok-punc">${escapeHtml(ch)}</span>`;
+      } else {
+        out += escapeHtml(ch);
+      }
     }
   }
   return out;
