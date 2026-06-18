@@ -142,6 +142,11 @@ int main() {
                     getline(cin, value);
 
                     vars["input"] = value;
+                }else if (line.find("Action" == 0)){
+                        cout << "Hello boss\n";
+                        cout << "See ya later!\n";
+                   
+
                 }
             }
 
