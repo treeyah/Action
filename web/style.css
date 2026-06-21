@@ -208,6 +208,62 @@ body::before {
 }
 .ref-note code { color: var(--accent); }
 
+/* ---------- Examples gallery ---------- */
+#examples-view {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 1rem;
+  gap: 1rem;
+}
+#examples-list {
+  flex: 1;
+  overflow: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  align-content: start;
+}
+.example-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.example-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+}
+.example-card-header .name {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--accent);
+}
+.example-card .desc {
+  color: var(--muted);
+  margin: 0;
+  padding: 0.6rem 0.9rem 0;
+  font-size: 0.95rem;
+}
+.example-card pre {
+  margin: 0.6rem 0.9rem 0.9rem;
+  padding: 0.7rem;
+  background: #160f08;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  overflow: auto;
+  max-height: 11rem;
+}
+
 /* ---------- Buttons (editor toolbar etc.) ---------- */
 button {
   background: var(--surface-2);
@@ -265,10 +321,85 @@ button.primary:hover { color: var(--accent-fg); opacity: 0.92; }
   margin-bottom: 0.4rem;
 }
 
-#code, #output {
+.code-wrap {
+  position: relative;
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.code-wrap:focus-within { border-color: var(--accent); }
+
+/* Line-number gutter */
+.gutter {
+  flex: 0 0 auto;
+  min-width: 2.5ch;
+  padding: 1rem 0.5rem 1rem 0.75rem;
+  text-align: right;
+  color: var(--muted);
+  background: rgba(0, 0, 0, 0.18);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  white-space: pre;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* The textarea and the colour layer are stacked exactly on top of each other */
+.code-stack { position: relative; flex: 1; min-height: 0; }
+
+#code, #highlight {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  border: 0;
+  padding: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow: auto;
+}
+/* Colour layer behind: shows the highlighted code */
+#highlight {
+  z-index: 0;
+  background: transparent;
+  color: var(--fg);
+  pointer-events: none;
+}
+/* Each command category gets its own colour */
+#highlight .tok-write   { color: #e0a85c; } /* write — gold */
+#highlight .tok-math    { color: #88c98a; } /* add/minus/times/divide — green */
+#highlight .tok-var     { color: #6fb4e6; } /* set/get — blue */
+#highlight .tok-random  { color: #cf8fd9; } /* random — purple */
+#highlight .tok-repeat  { color: #ef9b63; } /* repeat — orange */
+#highlight .tok-newline { color: #54c8b4; } /* newline — teal */
+#highlight .tok-input   { color: #e6d264; } /* input — yellow */
+#highlight .tok-meta    { color: var(--muted); } /* run/list/clear/exit */
+/* Inside the brackets */
+#highlight .tok-punc    { color: #f0c674; } /* brackets and + - * / = , */
+#highlight .tok-arg     { color: #ece0c8; } /* text inside brackets — soft cream */
+#highlight .tok-num     { color: #e89a9a; } /* numbers — rose */
+/* Textarea on top: transparent text so the colour layer shows, caret visible */
+#code {
+  z-index: 1;
+  background: transparent;
+  color: transparent;
+  caret-color: var(--accent);
+  resize: none;
+}
+#code:focus { outline: none; }
+#code::placeholder { color: var(--muted); }
+
+#output {
   flex: 1;
   background: var(--surface);
-  color: var(--fg);
+  color: var(--accent);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 1rem;
@@ -280,8 +411,54 @@ button.primary:hover { color: var(--accent-fg); opacity: 0.92; }
   white-space: pre-wrap;
   margin: 0;
 }
-#code:focus { outline: none; border-color: var(--accent); }
-#output { color: var(--accent); }
+#output .warn { color: #e6a86b; font-style: italic; }
+
+/* Autocomplete popup (VSCode-style command suggestions) */
+.autocomplete {
+  position: absolute;
+  z-index: 50;
+  margin: 0;
+  padding: 0.25rem;
+  list-style: none;
+  background: var(--surface-2);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  max-height: 14rem;
+  overflow-y: auto;
+  min-width: 16rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+}
+.autocomplete li {
+  padding: 0.4rem 0.6rem;
+  border-radius: calc(var(--radius) - 0.15rem);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+.autocomplete li .ac-name { color: var(--accent); }
+.autocomplete li .ac-desc {
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+}
+.autocomplete li.ac-empty {
+  color: var(--muted);
+  font-style: italic;
+  cursor: default;
+}
+.autocomplete li.ac-empty:hover { background: transparent; }
+
+.autocomplete li.active,
+.autocomplete li:not(.ac-empty):hover {
+  background: var(--accent);
+}
+.autocomplete li.active .ac-name,
+.autocomplete li:hover .ac-name { color: var(--accent-fg); }
+.autocomplete li.active .ac-desc,
+.autocomplete li:hover .ac-desc { color: var(--accent-fg); opacity: 0.85; }
 
 /* Inline input field shown in the output when input() runs */
 .inline-input {

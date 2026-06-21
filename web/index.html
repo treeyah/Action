@@ -19,6 +19,7 @@
 
     <div class="menu-actions">
       <button id="new-btn" class="big-btn">Start a new code</button>
+      <button id="examples-btn" class="big-btn btn-secondary">Examples</button>
       <button id="show-all-btn" class="big-btn btn-secondary">Commands</button>
     </div>
 
@@ -101,6 +102,15 @@
     </p>
   </section>
 
+  <!-- ============ EXAMPLES VIEW ============ -->
+  <section id="examples-view" class="view" hidden>
+    <header class="editor-header">
+      <button id="examples-back-btn">&larr; Menu</button>
+      <span class="program-name">Examples</span>
+    </header>
+    <div id="examples-list"></div>
+  </section>
+
   <!-- ============ EDITOR VIEW ============ -->
   <section id="editor-view" class="view" hidden>
     <header class="editor-header">
@@ -116,12 +126,19 @@
     <div class="panes">
       <div class="pane">
         <label class="pane-label">Code</label>
-        <textarea id="code" spellcheck="false" placeholder="write(Hello)
+        <div class="code-wrap">
+          <div id="gutter" class="gutter" aria-hidden="true">1</div>
+          <div class="code-stack">
+            <pre id="highlight" class="highlight" aria-hidden="true"></pre>
+            <textarea id="code" spellcheck="false" placeholder="write(Hello)
 set(user=Ben)
 get(user)
 add(10+5)
 repeat(2)
 write(Hi)"></textarea>
+            <ul id="autocomplete" class="autocomplete" hidden></ul>
+          </div>
+        </div>
       </div>
       <div class="pane">
         <label class="pane-label">Output</label>
