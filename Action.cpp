@@ -12,12 +12,9 @@ int main() {
     string c;
     vector<string> program;
     map<string, string> vars;
-
     srand(time(0));
-
     while (true) {
         getline(cin, c);
-
         if (c == "exit()") {
             break;
         }
@@ -50,24 +47,21 @@ int main() {
                 else if (line.find("add(") == 0) {
                     int a, b;
                     sscanf(line.c_str(), "add(%d+%d)", &a, &b);
-
                     for (int i = 0; i < repeatCount; i++) {
                         cout << a + b;
                     }
 
                     repeatCount = 1;
                 }
-
                 else if (line.find("minus(") == 0) {
                     int a, b;
                     sscanf(line.c_str(), "minus(%d-%d)", &a, &b);
-
                     for (int i = 0; i < repeatCount; i++) {
                         cout << a - b;
                     }
-
                     repeatCount = 1;
                 }
+
 
                 else if (line.find("times(") == 0) {
                     int a, b;
@@ -76,7 +70,6 @@ int main() {
                     for (int i = 0; i < repeatCount; i++) {
                         cout << a * b;
                     }
-
                     repeatCount = 1;
                 }
 
@@ -99,29 +92,23 @@ int main() {
                 else if (line.find("set(") == 0) {
                     string inside = line.substr(4, line.size() - 5);
                     int equals = inside.find('=');
-
                     string name = inside.substr(0, equals);
                     string value = inside.substr(equals + 1);
-
                     vars[name] = value;
                 }
 
                 else if (line.find("get(") == 0) {
                     string name = line.substr(4, line.size() - 5);
-
                     for (int i = 0; i < repeatCount; i++) {
                         cout << vars[name];
                     }
-
                     repeatCount = 1;
                 }
 
                 else if (line.find("random(") == 0) {
                     int min, max;
                     sscanf(line.c_str(), "random(%d,%d)", &min, &max);
-
                     int result = rand() % (max - min + 1) + min;
-
                     for (int i = 0; i < repeatCount; i++) {
                         cout << result;
                     }
@@ -133,7 +120,6 @@ int main() {
                     for (int i = 0; i < repeatCount; i++) {
                         cout << "\n";
                     }
-
                     repeatCount = 1;
                 }
 
@@ -142,14 +128,9 @@ int main() {
                     getline(cin, value);
 
                     vars["input"] = value;
-                }else if (line.find("Action" == 0)){
-                        cout << "Hello boss\n";
-                        cout << "See ya later!\n";
-                   
-
+                }
                 }
             }
-
             cout << "\nProgram finished.\n";
         }
         else {
