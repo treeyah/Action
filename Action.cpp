@@ -5,7 +5,6 @@
 #include <cstdio>
 #include <ctime>
 #include <cstdlib>
-
 using namespace std;
 
 int main() {
@@ -28,9 +27,7 @@ int main() {
             }
         }
         else if (c == "run()") {
-
             int repeatCount = 1;
-
             for (string line : program) {
 
                 if (line.find("repeat(") == 0) {
@@ -66,7 +63,6 @@ int main() {
                 else if (line.find("times(") == 0) {
                     int a, b;
                     sscanf(line.c_str(), "times(%d*%d)", &a, &b);
-
                     for (int i = 0; i < repeatCount; i++) {
                         cout << a * b;
                     }
@@ -76,7 +72,6 @@ int main() {
                 else if (line.find("divide(") == 0) {
                     int a, b;
                     sscanf(line.c_str(), "divide(%d/%d)", &a, &b);
-
                     if (b == 0) {
                         cout << "Error: Cannot divide by zero.";
                     }
@@ -131,10 +126,10 @@ int main() {
                 }
                 }
             }
-            cout << "\nProgram finished.\n";
+            cout << "\nProgram finished.\n";  
         }
         else {
-            program.push_back(c);
+            program.push_back(c);    
         }
     }
 
